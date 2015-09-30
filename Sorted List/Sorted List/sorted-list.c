@@ -23,7 +23,7 @@
 
 SortedListPtr SLCreate(CompareFuncT cf, DestructFuncT df){
     SortedListPtr list = (SortedListPtr)malloc(sizeof(struct SortedList));
-    list->compareFuncT = (int(*)(void *, void *))malloc(sizeof(int(*)(void *, void *)));
+    list->compareFuncT = cf;
     list->destructFuncT = (void(*)(void *))malloc(sizeof(void(*)(void *)));
     return list;
 }
