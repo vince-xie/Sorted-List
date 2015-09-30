@@ -11,6 +11,11 @@
  */
 struct SortedList
 {
+    int (*compareFuncT)( void *, void * );
+    void (*destructFuncT)( void * );
+    void *data;
+    struct SortedList *previous;
+    struct SortedList *next;
 };
 typedef struct SortedList* SortedListPtr;
 
@@ -21,6 +26,9 @@ typedef struct SortedList* SortedListPtr;
  */
 struct SortedListIterator
 {
+    SortedListPtr previous;
+    SortedListPtr current;
+    SortedListPtr next;
 };
 typedef struct SortedListIterator* SortedListIteratorPtr;
 
