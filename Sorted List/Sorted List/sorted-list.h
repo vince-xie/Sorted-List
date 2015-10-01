@@ -6,6 +6,14 @@
 
 #include <stdlib.h>
 
+
+typedef struct Node{
+    void *data;
+    struct Node *prev;
+    struct Node *next;
+} Node;
+
+
 /*
  * Sorted list type.  You need to fill in the type as part of your implementation.
  */
@@ -13,9 +21,7 @@ struct SortedList
 {
     int (*compareFuncT)( void *, void * );
     void (*destructFuncT)( void * );
-    void *data;
-    struct SortedList *previous;
-    struct SortedList *next;
+    Node *head;
 };
 typedef struct SortedList* SortedListPtr;
 
@@ -26,9 +32,7 @@ typedef struct SortedList* SortedListPtr;
  */
 struct SortedListIterator
 {
-    SortedListPtr previous;
-    SortedListPtr current;
-    SortedListPtr next;
+    Node *current;
 };
 typedef struct SortedListIterator* SortedListIteratorPtr;
 

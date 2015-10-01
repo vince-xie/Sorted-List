@@ -10,6 +10,17 @@
 #include "sorted-list.h"
 
 /*
+ * Creates and allocates memory for a new node for the linked list.
+ */
+Node *createNewNode(){
+    Node *node = (Node *)malloc(sizeof(Node));
+    node->next = NULL;
+    node->data = NULL;
+    node->prev = NULL;
+    return node;
+}
+
+/*
  * SLCreate creates a new, empty sorted list.  The caller must provide
  * a comparator function that can be used to order objects that will be
  * kept in the list, and a destruct function that gets rid of the objects
@@ -24,7 +35,8 @@
 SortedListPtr SLCreate(CompareFuncT cf, DestructFuncT df){
     SortedListPtr list = (SortedListPtr)malloc(sizeof(struct SortedList));
     list->compareFuncT = cf;
-    list->destructFuncT = (void(*)(void *))malloc(sizeof(void(*)(void *)));
+    list->destructFuncT = df;
+    list->head = createNewNode();
     return list;
 }
 
@@ -49,7 +61,13 @@ void SLDestroy(SortedListPtr list){
  */
 
 int SLInsert(SortedListPtr list, void *newObj){
-    
+    SortedListIteratorPtr it = SLCreateIterator(list);
+    it->current = list->head;
+    if(it->current->data == NULL){
+        it->current->data = (void *)malloc(sizeof(void));
+        it->current->data = newObj;
+    }
+    return 1;
 }
 
 
@@ -66,7 +84,7 @@ int SLInsert(SortedListPtr list, void *newObj){
  */
 
 int SLRemove(SortedListPtr list, void *newObj){
-    
+    return 1;
 }
 
 
@@ -84,7 +102,12 @@ int SLRemove(SortedListPtr list, void *newObj){
  */
 
 SortedListIteratorPtr SLCreateIterator(SortedListPtr list){
-    
+    if(list == NULL){
+        return NULL;
+    }
+    SortedListIteratorPtr it = (SortedListIteratorPtr)malloc(sizeof(struct SortedListIterator));
+    it->current = list->head;
+    return it;
 }
 
 
@@ -111,7 +134,7 @@ void SLDestroyIterator(SortedListIteratorPtr iter){
  */
 
 void * SLGetItem( SortedListIteratorPtr iter ){
-    
+    return NULL;
 }
 
 /*
@@ -130,11 +153,13 @@ void * SLGetItem( SortedListIteratorPtr iter ){
  */
 
 void * SLNextItem(SortedListIteratorPtr iter){
-    
+    return NULL;
 }
 
 int main(int argc, const char * argv[]) {
-    // insert code here...
-    printf("Hello, World!\n");
+    char *string = "Hello";
+    SortedListPtr list = SLCreate( (int(*)( void *, void * ))strcmp , (void(*)(void *))SLDestroy);
+    SLInsert(list, string);
+    printf("%s", list->head->data);
     return 0;
 }
