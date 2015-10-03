@@ -11,31 +11,9 @@ typedef struct Node{
     void *data;
     struct Node *prev;
     struct Node *next;
+    int refrences;
+    int removed;
 } Node;
-
-
-/*
- * Sorted list type.  You need to fill in the type as part of your implementation.
- */
-struct SortedList
-{
-    int (*compareFuncT)( void *, void * );
-    void (*destructFuncT)( void * );
-    Node *head;
-};
-typedef struct SortedList* SortedListPtr;
-
-
-/*
- * Iterator type for user to "walk" through the list item by item, from
- * beginning to end.  You need to fill in the type as part of your implementation.
- */
-struct SortedListIterator
-{
-    Node *current;
-};
-typedef struct SortedListIterator* SortedListIteratorPtr;
-
 
 /*
  * When your sorted list is used to store objects of some type, since the
@@ -53,6 +31,30 @@ typedef struct SortedListIterator* SortedListIteratorPtr;
 
 typedef int (*CompareFuncT)( void *, void * );
 typedef void (*DestructFuncT)( void * );
+
+
+/*
+ * Sorted list type.  You need to fill in the type as part of your implementation.
+ */
+struct SortedList
+{
+    CompareFuncT compare;
+    DestructFuncT destroy;
+    Node *head;
+};
+typedef struct SortedList* SortedListPtr;
+
+
+/*
+ * Iterator type for user to "walk" through the list item by item, from
+ * beginning to end.  You need to fill in the type as part of your implementation.
+ */
+struct SortedListIterator
+{
+    Node *current;
+    void (*destructFuncT)( void * );
+};
+typedef struct SortedListIterator* SortedListIteratorPtr;
 
 /*
  * SLCreate creates a new, empty sorted list.  The caller must provide

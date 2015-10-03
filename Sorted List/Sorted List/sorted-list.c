@@ -17,6 +17,8 @@ Node *createNewNode(){
     node->next = NULL;
     node->data = NULL;
     node->prev = NULL;
+    node->removed = 0;
+    node->refrences = 1;
     return node;
 }
 
@@ -34,8 +36,8 @@ Node *createNewNode(){
 
 SortedListPtr SLCreate(CompareFuncT cf, DestructFuncT df){
     SortedListPtr list = (SortedListPtr)malloc(sizeof(struct SortedList));
-    list->compareFuncT = cf;
-    list->destructFuncT = df;
+    list->compare = cf;
+    list->destroy = df;
     list->head = createNewNode();
     return list;
 }
@@ -61,21 +63,49 @@ void SLDestroy(SortedListPtr list){
  */
 
 int SLInsert(SortedListPtr list, void *newObj){
-    if(list->head->data == NULL){
-        list->head->data = (void *)malloc(sizeof(void));
+    if(list == NULL || newObj == NULL){
+        return 0;
+    }
+    if(list->head->data == NULL){ //check if head
         list->head->data = newObj;
     } else {
-        SortedListIteratorPtr it = SLCreateIterator(list);
-        it->current = list->head;
-        while(list->compareFuncT(newObj, it->current->data) > 0){
-            if(it->current->next != NULL){
-                it->current = it->current->next;
-            } else {
-                it->current->next = createNewNode();
-                it->current->next->prev = it->current;
-                it->current = it->current->next;
-                it->current->data = newObj;
+        Node *temp = list->head;
+        if(list->compare(newObj, temp->data) < 0){
+            Node *newNode = createNewNode();
+            newNode->next = list->head;
+            list->head->prev = newNode;
+            list->head = newNode;
+        }
+        while(list->compare(newObj, temp->data) > 0){
+            if(temp->next != NULL){ //checks if not end of list, and moves forward
+                temp = temp->next;
+            } else { //creates new node if end of list
+                temp->next = createNewNode();
+                temp->next->prev = temp;
+                temp = temp->next;
+                temp->data = newObj;
                 return 1;
+            }
+        }
+        if(list->compare(newObj, temp->data) == 0){ //checks to see if duplicate
+            return 0;
+        } else {
+            if(temp->prev != NULL){
+                temp = temp->prev;
+            }
+            Node *newNode = createNewNode(); //new node
+            if(temp->next != NULL){ //adds newObj to list
+                newNode->next = temp->next;
+                newNode->prev = temp;
+                temp->next->prev = newNode;
+                temp->next = newNode;
+                temp = temp->next;
+                temp->data = newObj;
+            } else {
+                temp->next = newNode;
+                temp->next->prev = temp;
+                temp->next->data = temp->data;
+                temp->data = newObj;
             }
         }
     }
@@ -119,6 +149,7 @@ SortedListIteratorPtr SLCreateIterator(SortedListPtr list){
     }
     SortedListIteratorPtr it = (SortedListIteratorPtr)malloc(sizeof(struct SortedListIterator));
     it->current = list->head;
+    list->head->refrences++;
     return it;
 }
 
@@ -146,7 +177,7 @@ void SLDestroyIterator(SortedListIteratorPtr iter){
  */
 
 void * SLGetItem( SortedListIteratorPtr iter ){
-    return NULL;
+    return 0;
 }
 
 /*
@@ -172,15 +203,22 @@ void printList(SortedListPtr list){
     SortedListIteratorPtr it = SLCreateIterator(list);
     it->current = list->head;
     while(it->current != NULL){
-        printf("%s\n", it->current->data);
+        printf("%s %d\n", it->current->data, it->current->refrences);
         it->current = it->current->next;
     }
 }
 
 int main(int argc, const char * argv[]) {
-    SortedListPtr list = SLCreate( (int(*)( void *, void * ))strcmp , (void(*)(void *))SLDestroy);
+    SortedListPtr list = SLCreate( (int(*)( void *, void * ))strcasecmp , (void(*)(void *))SLDestroy);
     SLInsert(list, "Hello");
+    SLInsert(list, "ZZZ");
+    SLInsert(list, "Awesome");
+    SLInsert(list, "apple");
+    SLInsert(list, "Zed");
     SLInsert(list, "Time");
+    SLInsert(list, "Rate");
+    SLInsert(list, "Test");
     printList(list);
+    printf("%d\n", SLInsert(list, "Time"));
     return 0;
 }
