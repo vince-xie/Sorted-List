@@ -66,11 +66,11 @@ int SLInsert(SortedListPtr list, void *newObj){
     if(list == NULL || newObj == NULL){
         return 0;
     }
-    if(list->head->data == NULL){ //check if head
+    if(list->head->data == NULL){ //check if head empty
         list->head->data = newObj;
     } else {
         Node *temp = list->head;
-        if(list->compare(newObj, temp->data) < 0){
+        if(list->compare(newObj, temp->data) < 0){ //checks if it comes before the head
             Node *newNode = createNewNode();
             newNode->next = list->head;
             list->head->prev = newNode;
@@ -177,7 +177,10 @@ void SLDestroyIterator(SortedListIteratorPtr iter){
  */
 
 void * SLGetItem( SortedListIteratorPtr iter ){
-    return 0;
+    if(iter == NULL || iter->current == NULL){ //checks if end of list or null passed
+        return 0;
+    }
+    return iter->current->data; //returns data otherwise
 }
 
 /*
@@ -196,16 +199,34 @@ void * SLGetItem( SortedListIteratorPtr iter ){
  */
 
 void * SLNextItem(SortedListIteratorPtr iter){
-    return NULL;
+    if(iter == NULL || iter->current == NULL){ //Null safety check
+        return NULL;
+    }
+    Node *temp = iter->current;
+    iter->current = temp->next; //advances iterator
+    temp->refrences--;
+    if(temp->refrences == 0 && temp->removed == 1){ //checks if node can be freed
+        iter->destroy(temp);
+        free(temp);
+    }
+    if(iter->current == NULL){ //check if end of list
+        return NULL;
+    }
+    iter->current->refrences++; //updates
+    return iter->current->data;
 }
 
+/*
+ * Prints out the list. For testing purposes only. MUST change printf statement depending on type.
+ */
 void printList(SortedListPtr list){
     SortedListIteratorPtr it = SLCreateIterator(list);
     it->current = list->head;
-    while(it->current != NULL){
-        printf("%s %d\n", it->current->data, it->current->refrences);
-        it->current = it->current->next;
+    printf("%s %d\n", it->current->data, it->current->refrences);
+    while(it->current->next != NULL){
+        printf("%s %d\n", SLNextItem(it), it->current->refrences);
     }
+    SLDestroyIterator(it);
 }
 
 int main(int argc, const char * argv[]) {

@@ -52,7 +52,7 @@ typedef struct SortedList* SortedListPtr;
 struct SortedListIterator
 {
     Node *current;
-    void (*destructFuncT)( void * );
+    DestructFuncT destroy;
 };
 typedef struct SortedListIterator* SortedListIteratorPtr;
 
