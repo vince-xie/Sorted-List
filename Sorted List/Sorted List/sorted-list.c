@@ -18,7 +18,7 @@ Node *createNewNode(){
     node->data = NULL;
     node->prev = NULL;
     node->removed = 0;
-    node->refrences = 0;
+    node->refrences = 1;
     return node;
 }
 
@@ -39,6 +39,7 @@ SortedListPtr SLCreate(CompareFuncT cf, DestructFuncT df){
     list->compare = cf;
     list->destroy = df;
     list->head = createNewNode();
+    list->head->refrences = 0;
     return list;
 }
 
@@ -73,8 +74,10 @@ int SLInsert(SortedListPtr list, void *newObj){
         if(list->compare(newObj, temp->data) < 0){ //checks if it comes before the head
             Node *newNode = createNewNode();
             newNode->next = list->head;
+            list->head->refrences++;
             list->head->prev = newNode;
             list->head = newNode;
+            list->head->refrences--;
         }
         while(list->compare(newObj, temp->data) > 0){
             if(temp->next != NULL){ //checks if not end of list, and moves forward
@@ -149,6 +152,7 @@ SortedListIteratorPtr SLCreateIterator(SortedListPtr list){
     }
     SortedListIteratorPtr it = (SortedListIteratorPtr)malloc(sizeof(struct SortedListIterator));
     it->current = list->head;
+    it->destroy = list->destroy;
     list->head->refrences++;
     return it;
 }
@@ -199,20 +203,28 @@ void * SLGetItem( SortedListIteratorPtr iter ){
  */
 
 void * SLNextItem(SortedListIteratorPtr iter){
-    if(iter == NULL || iter->current == NULL){ //Null safety check
-        return NULL;
+    if(iter->current->removed == 1){
+        while(iter->current->removed == 1){
+            if(iter == NULL || iter->current == NULL){ //Null safety check
+                return NULL;
+            }
+            Node *temp = iter->current;
+            iter->current = temp->next; //advances iterator
+            temp->refrences--;
+            if(temp->refrences == 0 && temp->removed == 1){ //checks if node can be freed
+                iter->destroy(temp->data);
+                free(temp);
+            }
+            if(iter->current == NULL){ //check if end of list
+                return NULL;
+            }
+            iter->current->refrences++; //updates references
+        }
+    } else {
+        iter->current->refrences--;
+        iter->current = iter->current->next;
+        iter->current->refrences++;
     }
-    Node *temp = iter->current;
-    iter->current = temp->next; //advances iterator
-    temp->refrences--;
-    if(temp->refrences == 0 && temp->removed == 1){ //checks if node can be freed
-        iter->destroy(temp->data);
-        free(temp);
-    }
-    if(iter->current == NULL){ //check if end of list
-        return NULL;
-    }
-    iter->current->refrences++; //updates
     return iter->current->data;
 }
 
@@ -241,5 +253,7 @@ int main(int argc, const char * argv[]) {
     SLInsert(list, "Test");
     printList(list);
     printf("%d\n", SLInsert(list, "Time"));
+    printf("%d\n", SLInsert(list, "apple"));
+    printf("%d\n", SLInsert(list, "ZZZ"));
     return 0;
 }
