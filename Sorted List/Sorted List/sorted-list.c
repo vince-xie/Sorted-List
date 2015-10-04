@@ -39,7 +39,6 @@ SortedListPtr SLCreate(CompareFuncT cf, DestructFuncT df){
     list->compare = cf;
     list->destroy = df;
     list->head = createNewNode();
-    list->head->refrences = 0;
     return list;
 }
 
@@ -74,10 +73,8 @@ int SLInsert(SortedListPtr list, void *newObj){
         if(list->compare(newObj, temp->data) < 0){ //checks if it comes before the head
             Node *newNode = createNewNode();
             newNode->next = list->head;
-            list->head->refrences++;
             list->head->prev = newNode;
             list->head = newNode;
-            list->head->refrences--;
         }
         while(list->compare(newObj, temp->data) > 0){
             if(temp->next != NULL){ //checks if not end of list, and moves forward
