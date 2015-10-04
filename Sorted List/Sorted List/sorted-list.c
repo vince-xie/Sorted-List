@@ -184,7 +184,7 @@ int SLRemove(SortedListPtr list, void *newObj){
         
         if(a->refrences == 0)
         {
-            //list->destroy(a->data);
+            list->destroy(a->data);
             free(a);
         }
         else{
@@ -213,7 +213,7 @@ int SLRemove(SortedListPtr list, void *newObj){
             
             if(tmp->refrences == 0)
             {
-                //list->destroy(tmp->data);
+                list->destroy(tmp->data);
                 free(tmp);
             }
             else
@@ -280,7 +280,7 @@ void SLDestroyIterator(SortedListIteratorPtr iter){
             Node *temp2 = temp;
             temp = temp->next;
             temp->refrences--;
-            //iter->destroy(temp2->data);
+            iter->destroy(temp2->data);
             free(temp2);
             
         }
@@ -353,7 +353,7 @@ void * SLNextItem(SortedListIteratorPtr iter){
             iter->current = temp->next; //advances iterator
             temp->refrences--;
             if(temp->refrences == 0 && temp->removed == 1){ //checks if node can be freed
-                //iter->destroy(temp->data);
+                iter->destroy(temp->data);
                 free(temp);
             }
             if(iter->current == NULL){ //check if end of list
@@ -365,6 +365,7 @@ void * SLNextItem(SortedListIteratorPtr iter){
     } else {
         iter->current->refrences--;
         if(iter->current->next == NULL){
+            iter->current = NULL;
             return NULL;
         }
         iter->current = iter->current->next;
