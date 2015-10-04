@@ -48,7 +48,28 @@ SortedListPtr SLCreate(CompareFuncT cf, DestructFuncT df){
  * You need to fill in this function as part of your implementation.
  */
 void SLDestroy(SortedListPtr list){
-    
+    if(list == NULL){
+        return;
+    }
+    if(list->head == NULL){
+        free(list);
+        return;
+    }
+    Node* temp = list->head;
+    Node* temp2;
+    while(temp != NULL){
+        temp2 = temp;
+        temp = temp->next;
+        temp2->refrences--;
+        if(temp2->refrences == 0){
+            //list->destroy(temp2->data);
+            free(temp2);
+        }else{
+            temp2->removed = 1;
+        }
+        
+    }
+    free(list);
 }
 
 
@@ -75,6 +96,7 @@ int SLInsert(SortedListPtr list, void *newObj){
             newNode->next = list->head;
             list->head->prev = newNode;
             list->head = newNode;
+            list->head->data = newObj;
         }
         while(list->compare(newObj, temp->data) > 0){
             if(temp->next != NULL){ //checks if not end of list, and moves forward
@@ -126,7 +148,78 @@ int SLInsert(SortedListPtr list, void *newObj){
  */
 
 int SLRemove(SortedListPtr list, void *newObj){
-    return 1;
+    if(newObj == NULL || list == NULL || list->head == NULL)
+        return 0;
+    
+    
+    //used for head check
+    Node *a;
+    Node *b;
+    
+    //used for traversing the list
+    Node *tmp;
+    Node *prev;
+    
+    
+    //check if head is object to be removed
+    a = list->head;
+    if(list->compare(a->data,newObj) == 0)
+    {
+        
+        b = a->next;
+        list->head = b;
+        
+        if(b != NULL){
+            b->refrences++;
+        }
+        
+        a->refrences--;
+        
+        if(a->refrences == 0)
+        {
+            //list->destroy(a->data);
+            free(a);
+        }
+        else{
+            a->removed = 1;
+        }
+        
+        return 1;
+    }
+    
+    
+    //Traverse list. If object to remove is found, either set the remove flag or free the node if there are no references.
+    prev = list->head;
+    tmp = prev->next;
+    
+    while(tmp != NULL)
+    {
+        if(list->compare(tmp->data,newObj) == 0)
+        {
+            prev->next = tmp->next;
+            
+            if(tmp->next != NULL){
+                tmp->next->refrences++;
+            }
+            
+            tmp->refrences--;
+            
+            if(tmp->refrences == 0)
+            {
+                //list->destroy(tmp->data);
+                free(tmp);
+            }
+            else
+            {
+                a->removed = 1;
+            }
+            return 1;
+        }
+        prev = tmp;
+        tmp = tmp->next;
+    }
+    
+    return 0;
 }
 
 
@@ -165,7 +258,26 @@ SortedListIteratorPtr SLCreateIterator(SortedListPtr list){
  */
 
 void SLDestroyIterator(SortedListIteratorPtr iter){
-    
+    if(iter->current == NULL)
+    {
+        free(iter);
+    }
+    else
+    {
+        Node *temp = iter->current;
+        temp->refrences--;
+        //check for chain of deleted nodes
+        while(temp->refrences == 0 && temp->removed == 1 && temp != NULL)
+        {
+            Node *temp2 = temp;
+            temp = temp->next;
+            temp->refrences--;
+            //iter->destroy(temp2->data);
+            free(temp2);
+            
+        }
+        free(iter);
+    }
 }
 
 
@@ -200,11 +312,11 @@ void * SLGetItem( SortedListIteratorPtr iter ){
  */
 
 void * SLNextItem(SortedListIteratorPtr iter){
+    if(iter == NULL || iter->current == NULL){ //Null safety check
+        return NULL;
+    }
     if(iter->current->removed == 1){
         while(iter->current->removed == 1){
-            if(iter == NULL || iter->current == NULL){ //Null safety check
-                return NULL;
-            }
             Node *temp = iter->current;
             iter->current = temp->next; //advances iterator
             temp->refrences--;
@@ -219,6 +331,9 @@ void * SLNextItem(SortedListIteratorPtr iter){
         }
     } else {
         iter->current->refrences--;
+        if(iter->current->next == NULL){
+            return NULL;
+        }
         iter->current = iter->current->next;
         iter->current->refrences++;
     }
