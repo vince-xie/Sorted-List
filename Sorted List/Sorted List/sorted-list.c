@@ -309,22 +309,23 @@ void * SLGetItem( SortedListIteratorPtr iter ){
  * point to the correct next node anymore. So it restarts at the beginning
  * and puts the iterator at the correct next spot.
  */
-void correctIterator(SortedListIteratorPtr iter, void *item){
+Node *correctIterator(SortedListIteratorPtr iter, void *item){
     if(iter == NULL || iter->current->data == NULL || iter->list == NULL || iter->list->head == NULL || iter->list->head->data == NULL){
-        return;
+        return NULL;
     }
-    iter->current = iter->list->head;
-    while(iter->list->compare(item, iter->current->next->data) < 0){
-        if(iter->current->next == NULL){
-            return;
+    Node *temp = iter->list->head;
+    while(iter->list->compare(item, temp->next->data) < 0){
+        if(temp->next == NULL){
+            return NULL;
         }
-        iter->current = iter->current->next;
+        temp = temp->next;
     }
-    if(iter->current->next == NULL || iter->list->compare(item, iter->current->next->data) > 0){
-        return;
+    if(iter->current->next == NULL){
+        return NULL;
     }
-    iter->current = iter->current->next;
-    iter->current->refrences++;
+    temp = temp->next;
+    temp->refrences++;
+    return temp;
 }
 
 /*
@@ -348,6 +349,7 @@ void * SLNextItem(SortedListIteratorPtr iter){
     }
     if(iter->current->removed == 1){
         void *item = iter->current->data;
+        Node *newPlacement = correctIterator(iter, item); //corrects corner case. see function for more details
         while(iter->current->removed == 1){
             Node *temp = iter->current;
             iter->current = temp->next; //advances iterator
@@ -360,9 +362,11 @@ void * SLNextItem(SortedListIteratorPtr iter){
                 return NULL;
             }
         }
-        correctIterator(iter, item); //corrects corner case. see function for more details
+        if(iter->current != iter->list->head){
+            iter->current = newPlacement;
+        }
         return iter->current->data;
-    } else {
+    } else { //if iterator is not on a removed node, just advance one
         iter->current->refrences--;
         if(iter->current->next == NULL){
             iter->current = NULL;
@@ -371,5 +375,5 @@ void * SLNextItem(SortedListIteratorPtr iter){
         iter->current = iter->current->next;
         iter->current->refrences++;
     }
-    return iter->current->data;
+    return iter->current->data; //returns data
 }
