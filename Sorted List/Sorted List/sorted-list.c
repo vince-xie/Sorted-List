@@ -91,14 +91,15 @@ int SLInsert(SortedListPtr list, void *newObj){
         list->head->data = newObj;
     } else {
         Node *temp = list->head;
-        if(list->compare(newObj, temp->data) < 0){ //checks if it comes before the head
+        if(list->compare(newObj, temp->data) > 0){ //checks if it comes before the head
             Node *newNode = createNewNode();
             newNode->next = list->head;
             list->head->prev = newNode;
             list->head = newNode;
             list->head->data = newObj;
+            return 1;
         }
-        while(list->compare(newObj, temp->data) > 0){
+        while(list->compare(newObj, temp->data) < 0){
             if(temp->next != NULL){ //checks if not end of list, and moves forward
                 temp = temp->next;
             } else { //creates new node if end of list
@@ -237,7 +238,7 @@ int SLRemove(SortedListPtr list, void *newObj){
  */
 
 SortedListIteratorPtr SLCreateIterator(SortedListPtr list){
-    if(list == NULL){
+    if(list == NULL || list->head == NULL){
         return NULL;
     }
     SortedListIteratorPtr it = (SortedListIteratorPtr)malloc(sizeof(struct SortedListIterator));
@@ -258,7 +259,7 @@ SortedListIteratorPtr SLCreateIterator(SortedListPtr list){
  */
 
 void SLDestroyIterator(SortedListIteratorPtr iter){
-    if(iter->current == NULL)
+    if(iter == NULL || iter->current == NULL)
     {
         free(iter);
     }
@@ -321,7 +322,7 @@ void * SLNextItem(SortedListIteratorPtr iter){
             iter->current = temp->next; //advances iterator
             temp->refrences--;
             if(temp->refrences == 0 && temp->removed == 1){ //checks if node can be freed
-                iter->destroy(temp->data);
+                //iter->destroy(temp->data);
                 free(temp);
             }
             if(iter->current == NULL){ //check if end of list
