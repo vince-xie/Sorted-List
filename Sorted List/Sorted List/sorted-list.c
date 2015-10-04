@@ -246,6 +246,7 @@ SortedListIteratorPtr SLCreateIterator(SortedListPtr list){
     SortedListIteratorPtr it = (SortedListIteratorPtr)malloc(sizeof(struct SortedListIterator));
     it->current = list->head;
     it->destroy = list->destroy;
+    it->list = list;
     list->head->refrences++;
     return it;
 }
@@ -300,6 +301,26 @@ void * SLGetItem( SortedListIteratorPtr iter ){
 }
 
 /*
+ * This fixes the edge case where an iterator to a node does not 
+ * point to the correct next node anymore. So it restarts at the beginning
+ * and puts the iterator at the correct next spot.
+ */
+void correctIterator(SortedListIteratorPtr iter, void *item){
+    if(iter == NULL || iter->current->data == NULL || iter->list == NULL || iter->list->head == NULL){
+        return;
+    }
+    iter->current = iter->list->head;
+    while(iter->list->compare(item, iter->current->next->data) < 0){
+        if(iter->current->next == NULL){
+            return;
+        }
+        iter->current = iter->current->next;
+    }
+    iter->current = iter->current->next;
+    iter->current->refrences++;
+}
+
+/*
  * SLNextItem returns the pointer to the data associated with the
  * next object in the list associated with the given iterator.
  * It should return a NULL when the end of the list has been reached.
@@ -319,6 +340,7 @@ void * SLNextItem(SortedListIteratorPtr iter){
         return NULL;
     }
     if(iter->current->removed == 1){
+        void *item = iter->current->data;
         while(iter->current->removed == 1){
             Node *temp = iter->current;
             iter->current = temp->next; //advances iterator
@@ -330,8 +352,9 @@ void * SLNextItem(SortedListIteratorPtr iter){
             if(iter->current == NULL){ //check if end of list
                 return NULL;
             }
-            iter->current->refrences++; //updates references
         }
+        correctIterator(iter, item); //corrects corner case. see function for more details
+        return iter->current->data;
     } else {
         iter->current->refrences--;
         if(iter->current->next == NULL){

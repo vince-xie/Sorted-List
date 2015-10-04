@@ -53,6 +53,7 @@ struct SortedListIterator
 {
     Node *current;
     DestructFuncT destroy;
+    SortedListPtr list;
 };
 typedef struct SortedListIterator* SortedListIteratorPtr;
 
