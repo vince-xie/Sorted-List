@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6D3F5F801BC0C7D800C34F30 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 6D3F5F7F1BC0C7D800C34F30 /* main.c */; settings = {ASSET_TAGS = (); }; };
 		6DE705B41BB4A10400CF73C5 /* sorted-list.c in Sources */ = {isa = PBXBuildFile; fileRef = 6DE705B31BB4A10400CF73C5 /* sorted-list.c */; };
 /* End PBXBuildFile section */
 
@@ -23,6 +24,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		6D3F5F7F1BC0C7D800C34F30 /* main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		6DE705B01BB4A10400CF73C5 /* Sorted List */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "Sorted List"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6DE705B31BB4A10400CF73C5 /* sorted-list.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = "sorted-list.c"; sourceTree = "<group>"; };
 		6DE705BA1BB4A12500CF73C5 /* sorted-list.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "sorted-list.h"; sourceTree = "<group>"; };
@@ -58,6 +60,7 @@
 		6DE705B21BB4A10400CF73C5 /* Sorted List */ = {
 			isa = PBXGroup;
 			children = (
+				6D3F5F7F1BC0C7D800C34F30 /* main.c */,
 				6DE705BA1BB4A12500CF73C5 /* sorted-list.h */,
 				6DE705B31BB4A10400CF73C5 /* sorted-list.c */,
 			);
@@ -120,6 +123,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6D3F5F801BC0C7D800C34F30 /* main.c in Sources */,
 				6DE705B41BB4A10400CF73C5 /* sorted-list.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -237,6 +241,7 @@
 				6DE705B91BB4A10400CF73C5 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
