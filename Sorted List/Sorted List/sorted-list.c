@@ -98,9 +98,14 @@ int SLInsert(SortedListPtr list, void *newObj){
             list->head = newNode;
             list->head->data = newObj;
             return 1;
+        } else if (list->compare(newObj, temp->data) == 0){
+            return 0;
         }
         while(list->compare(newObj, temp->data) < 0){
             if(temp->next != NULL){ //checks if not end of list, and moves forward
+                if(list->compare(newObj, temp->next->data) >= 0){
+                    break;
+                }
                 temp = temp->next;
             } else { //creates new node if end of list
                 temp->next = createNewNode();
@@ -110,12 +115,9 @@ int SLInsert(SortedListPtr list, void *newObj){
                 return 1;
             }
         }
-        if(list->compare(newObj, temp->data) == 0){ //checks to see if duplicate
+        if(list->compare(newObj, temp->next->data) == 0){ //checks to see if duplicate
             return 0;
         } else {
-            if(temp->prev != NULL){
-                temp = temp->prev;
-            }
             Node *newNode = createNewNode(); //new node
             if(temp->next != NULL){ //adds newObj to list
                 newNode->next = temp->next;
@@ -212,7 +214,7 @@ int SLRemove(SortedListPtr list, void *newObj){
             }
             else
             {
-                a->removed = 1;
+                tmp->removed = 1;
             }
             return 1;
         }
