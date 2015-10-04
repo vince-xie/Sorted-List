@@ -18,7 +18,7 @@ Node *createNewNode(){
     node->data = NULL;
     node->prev = NULL;
     node->removed = 0;
-    node->refrences = 1;
+    node->refrences = 0;
     return node;
 }
 
@@ -206,7 +206,7 @@ void * SLNextItem(SortedListIteratorPtr iter){
     iter->current = temp->next; //advances iterator
     temp->refrences--;
     if(temp->refrences == 0 && temp->removed == 1){ //checks if node can be freed
-        iter->destroy(temp);
+        iter->destroy(temp->data);
         free(temp);
     }
     if(iter->current == NULL){ //check if end of list
