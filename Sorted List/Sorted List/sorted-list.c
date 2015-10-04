@@ -87,6 +87,10 @@ int SLInsert(SortedListPtr list, void *newObj){
     if(list == NULL || newObj == NULL){
         return 0;
     }
+    if(list->head == NULL){
+        list->head = createNewNode();
+        list->head->data = newObj;
+    }
     if(list->head->data == NULL){ //check if head empty
         list->head->data = newObj;
     } else {
@@ -151,7 +155,7 @@ int SLInsert(SortedListPtr list, void *newObj){
  */
 
 int SLRemove(SortedListPtr list, void *newObj){
-    if(newObj == NULL || list == NULL || list->head == NULL)
+    if(newObj == NULL || list == NULL || list->head == NULL || list->head->data == NULL)
         return 0;
     
     
@@ -306,7 +310,7 @@ void * SLGetItem( SortedListIteratorPtr iter ){
  * and puts the iterator at the correct next spot.
  */
 void correctIterator(SortedListIteratorPtr iter, void *item){
-    if(iter == NULL || iter->current->data == NULL || iter->list == NULL || iter->list->head == NULL){
+    if(iter == NULL || iter->current->data == NULL || iter->list == NULL || iter->list->head == NULL || iter->list->head->data == NULL){
         return;
     }
     iter->current = iter->list->head;
@@ -315,6 +319,9 @@ void correctIterator(SortedListIteratorPtr iter, void *item){
             return;
         }
         iter->current = iter->current->next;
+    }
+    if(iter->current->next == NULL || iter->list->compare(item, iter->current->next->data) > 0){
+        return;
     }
     iter->current = iter->current->next;
     iter->current->refrences++;
