@@ -62,7 +62,7 @@ void SLDestroy(SortedListPtr list){
         temp = temp->next;
         temp2->refrences--;
         if(temp2->refrences == 0){
-            //list->destroy(temp2->data);
+            list->destroy(temp2->data);
             free(temp2);
         }else{
             temp2->removed = 1;
@@ -310,20 +310,20 @@ void * SLGetItem( SortedListIteratorPtr iter ){
  * and puts the iterator at the correct next spot.
  */
 Node *correctIterator(SortedListIteratorPtr iter, void *item){
-    if(iter == NULL || iter->current->data == NULL || iter->list == NULL || iter->list->head == NULL || iter->list->head->data == NULL){
+    if(iter == NULL || iter->current->data == NULL || iter->list == NULL || iter->list->head == NULL || iter->list->head->data == NULL){ //null check
         return NULL;
     }
     Node *temp = iter->list->head;
-    while(iter->list->compare(item, temp->next->data) < 0){
+    while(iter->list->compare(item, temp->next->data) < 0){ //compare temp with item in list
         if(temp->next == NULL){
             return NULL;
         }
-        temp = temp->next;
+        temp = temp->next; //advance temp
     }
-    if(iter->current->next == NULL){
+    if(iter->current->next == NULL){ //check if end of list
         return NULL;
     }
-    temp = temp->next;
+    temp = temp->next; //moves temp to next one for SLNextItem()
     temp->refrences++;
     return temp;
 }
